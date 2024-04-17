@@ -19,6 +19,7 @@
           "client_type": 3
         }
       ],
+      "oauth_client": [],
       "api_key": [
         {
           "current_key": "AIzaSyAQ_UhF9-I8opqK1KWWWocVco0Ya8FuwYI"
@@ -39,6 +40,7 @@
               }
             }
           ]
+          "other_platform_oauth_client": []
         }
       }
     }

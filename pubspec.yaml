@@ -44,6 +44,7 @@ dependencies:
   #authentication packages
   firebase_auth: ^4.19.1
   google_sign_in: ^6.2.1
+  flutter_svg: ^2.0.10+1
 
 dev_dependencies:
   flutter_test:
@@ -68,8 +69,11 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
+
   # assets:
   #   - images/a_dot_burr.jpeg
+  assets:
+    - assets/icons/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
@@ -87,6 +91,13 @@ flutter:
   #   - family: Schyler
   #     fonts:
   #       - asset: fonts/Schyler-Regular.ttf
+  fonts:
+    - family: Outfit
+      fonts:
+        - asset: fonts/Outfit-SemiBold.ttf
+          weight: 600
+        - asset: fonts/Outfit-Regular.ttf
+          weight: 400
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro
