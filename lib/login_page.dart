@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -10,6 +11,10 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    clientId: '729272461010-g8ugbb2asksc67l7cv9a0jv94s3j814d.apps.googleusercontent.com',
+  );
+
   String _email = '';
   String _password = '';
   String _errorMessage = '';
@@ -36,6 +41,36 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  Future<void> _signInWithGoogle() async {
+      try {
+        final GoogleSignInAccount? googleSignInAccount = await _googleSignIn.signIn();
+        if (googleSignInAccount != null) {
+          final GoogleSignInAuthentication googleSignInAuthentication = await googleSignInAccount.authentication;
+          final AuthCredential credential = GoogleAuthProvider.credential(
+            accessToken: googleSignInAuthentication.accessToken,
+            idToken: googleSignInAuthentication.idToken,
+          );
+          final UserCredential userCredential = await _auth.signInWithCredential(credential);
+          // Get the authenticated user
+          User user = userCredential.user!;
+
+          // Navigate to home page and replace current route with home page
+          Navigator.pushReplacementNamed(
+            context,
+            '/home',
+            arguments: user, // Pass user as an argument
+          );
+        } else {
+          setState(() {
+            _errorMessage = 'Failed to sign in with Google';
+          });
+        }
+      } catch (e) {
+        setState(() {
+          _errorMessage = 'Failed to sign in with Google: $e';
+        });
+      }
+    }
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +103,10 @@ class _LoginPageState extends State<LoginPage> {
             ElevatedButton(
               onPressed: _signInWithEmailAndPassword,
               child: const Text('Sign In'),
+            ),
+            ElevatedButton(
+              onPressed: _signInWithGoogle,
+              child: const Text('Sign In with Google'),
             ),
             if (_errorMessage.isNotEmpty)
               Text(
