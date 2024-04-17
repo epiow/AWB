@@ -1,7 +1,6 @@
 {
   "project_info": {
     "project_number": "729272461010",
-    "firebase_url": "https://partnerup-993d9-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "partnerup-993d9",
     "storage_bucket": "partnerup-993d9.appspot.com"
   },
@@ -13,12 +12,7 @@
           "package_name": "com.example.partner_up"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "729272461010-g8ugbb2asksc67l7cv9a0jv94s3j814d.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
           "current_key": "AIzaSyAQ_UhF9-I8opqK1KWWWocVco0Ya8FuwYI"
@@ -26,19 +20,7 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "729272461010-g8ugbb2asksc67l7cv9a0jv94s3j814d.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "729272461010-j673hpuhi7pd84j9pbcvj78t6tajt3nv.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.partnerUp"
-              }
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }
