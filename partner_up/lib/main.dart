@@ -1,118 +1,221 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:partner_up/firebase_options.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'firebase_options.dart'; // Import Firebase options
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Firebase Authentication Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.red,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+  const MyHomePage({Key? key}) : super(key: key);
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  bool _isLoading = false;
+  String _signInMessage = '';
+  String email = ''; // Declare email variable
+  String password = ''; // Declare password variable
 
-  void _incrementCounter() {
+  Future<void> _signInWithEmailAndPassword(String email, String password) async {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      _isLoading = true;
+      _signInMessage = ''; // Clear previous sign-in message
     });
+
+    try {
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(email: email, password: password);
+      setState(() {
+        _isLoading = false;
+        _signInMessage = 'Signed in successfully: ${userCredential.user!.uid}';
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _signInMessage = 'Failed to sign in: $e';
+      });
+    }
+  }
+
+  Future<void> _signUpWithEmailAndPassword(String email, String password) async {
+    setState(() {
+      _isLoading = true;
+      _signInMessage = ''; // Clear previous sign-in message
+    });
+
+    try {
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
+      setState(() {
+        _isLoading = false;
+        _signInMessage = 'Signed up successfully: ${userCredential.user!.uid}';
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _signInMessage = 'Failed to sign up: $e';
+      });
+    }
+  }
+
+  Future<void> _signInWithGoogle() async {
+    setState(() {
+      _isLoading = true;
+      _signInMessage = ''; // Clear previous sign-in message
+    });
+
+    try {
+      final GoogleAuthProvider googleProvider = GoogleAuthProvider();
+      final UserCredential userCredential = await _auth.signInWithPopup(googleProvider);
+      setState(() {
+        _isLoading = false;
+        _signInMessage = 'Signed in with Google successfully: ${userCredential.user!.uid}';
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _signInMessage = 'Failed to sign in with Google: $e';
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: const Text('Firebase Authentication Demo'),
+        actions: [
+          _auth.currentUser != null
+              ? IconButton(
+                  icon: const Icon(Icons.exit_to_app),
+                  onPressed: () async {
+                    await _auth.signOut();
+                    setState(() {
+                      _signInMessage = 'Signed out successfully';
+                    });
+                  },
+                )
+              : Container(), // Hide sign-out button if not signed in
+          IconButton(
+            icon: const Icon(Icons.person_add),
+            onPressed: () {
+              // Navigate to sign-up page or implement sign-up functionality here
+              // For simplicity, let's just show a dialog for sign-up
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text('Sign Up'),
+                    content: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          TextField(
+                            decoration: const InputDecoration(labelText: 'Email'),
+                            onChanged: (value) {
+                              setState(() {
+                                email = value; // Update email variable
+                              });
+                            },
+                          ),
+                          TextField(
+                            decoration: const InputDecoration(labelText: 'Password'),
+                            obscureText: true,
+                            onChanged: (value) {
+                              setState(() {
+                                password = value; // Update password variable
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop(); // Close dialog
+                        },
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: _isLoading ? null : () => _signUpWithEmailAndPassword(email, password),
+                        child: _isLoading
+                            ? const CircularProgressIndicator() // Show loading indicator while signing up
+                            : const Text('Sign Up'),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+          ),
+        ],
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              TextField(
+                decoration: InputDecoration(hintText: 'Enter your email'),
+                onChanged: (value) {
+                  setState(() {
+                    email = value; // Update email variable
+                  });
+                },
+              ),
+              TextField(
+                decoration: InputDecoration(hintText: 'Enter your password'),
+                obscureText: true,
+                onChanged: (value) {
+                  setState(() {
+                    password = value; // Update password variable
+                  });
+                },
+              ),
+              ElevatedButton(
+                onPressed: _isLoading? null : () => _signInWithEmailAndPassword(email, password),
+                child: _isLoading
+                  ? const CircularProgressIndicator() // Show loading indicator while signing in
+                    : const Text('Sign in with email and password'),
+              ),
+              ElevatedButton(
+                onPressed: _isLoading ? null : _signInWithGoogle,
+                child: _isLoading
+                  ? const CircularProgressIndicator() // Show loading indicator while signing in
+                    : const Text(
+                                'Sign in with Google',
+                                style: TextStyle(color: Colors.white)),
+                style: ElevatedButton.styleFrom(backgroundColor: Color.fromARGB(255, 68, 34, 194)),
+              ),
+              const SizedBox(height: 20),
+              Text(_signInMessage), // Display sign-in message
+            ],
+          ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
