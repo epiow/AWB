@@ -16,11 +16,13 @@ class HomePage extends StatelessWidget {
             icon: const Icon(Icons.exit_to_app),
             onPressed: () async {
               await FirebaseAuth.instance.signOut();
-              Navigator.of(context).pop(); // Go back to previous screen (login page)
+              // Navigate back to login page and replace the current route
+              Navigator.pushReplacementNamed(context, '/login');
             },
           ),
         ],
       ),
+
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

@@ -20,14 +20,22 @@ class _LoginPageState extends State<LoginPage> {
         email: _email,
         password: _password,
       );
-      // Navigate to home page upon successful sign-in
-      Navigator.pushReplacementNamed(context, '/home');
+      // Get the authenticated user
+      User user = userCredential.user!;
+
+      // Navigate to home page and replace current route with home page
+      Navigator.pushReplacementNamed(
+        context,
+        '/home',
+        arguments: user, // Pass user as an argument
+      );
     } catch (e) {
       setState(() {
         _errorMessage = 'Failed to sign in: $e';
       });
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
